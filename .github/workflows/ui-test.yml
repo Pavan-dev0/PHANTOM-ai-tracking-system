@@ -44,10 +44,13 @@ jobs:
             frontend:
               - 'frontend/**'
             routes:
+              - 'backend/requirements.txt'
               - 'backend/routes/**'
             engine:
+              - 'backend/requirements.txt'
               - 'backend/engine/**'
             ai:
+              - 'backend/requirements.txt'
               - 'backend/ai/**'
 
   frontend-check:
@@ -88,7 +91,7 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
-          pip install flask openai
+          pip install flask flask-cors openai
 
       - name: Run routes check
         run: python tests/routes-check.py
@@ -113,7 +116,7 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
-          pip install flask openai
+          pip install flask flask-cors openai
 
       - name: Run engine check
         run: python tests/engine-check.py
@@ -140,7 +143,7 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
-          pip install flask openai
+          pip install flask flask-cors openai
 
       - name: Run AI check
         run: python tests/ai-check.py
@@ -172,7 +175,7 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
-          pip install flask openai
+          pip install flask flask-cors openai
 
       - name: Run system check
         run: python tests/system-check.py
