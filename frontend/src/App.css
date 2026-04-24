@@ -591,3 +591,22 @@ body {
   flex-shrink: 0;
   margin-top: 5px;
 }
+
+/* ---button remove--- */
+.remove-btn {
+  padding: 8px 14px;
+  background: none;
+  border: 1px solid #e24b4a;
+  border-radius: 7px;
+  color: #e24b4a;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .16s, color .16s;
+  white-space: nowrap;
+}
+.remove-btn:hover {
+  background: #e24b4a;
+  color: #fff;
+}
