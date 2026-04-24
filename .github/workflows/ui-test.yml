@@ -1,21 +1,176 @@
-name: UI Progress Check
+name: PHANTOM CI
 
 on:
   push:
+    paths:
+      - "frontend/**"
+      - "backend/routes/**"
+      - "backend/engine/**"
+      - "backend/ai/**"
+      - "tests/**"
+      - ".github/workflows/ui-test.yml"
   pull_request:
+    paths:
+      - "frontend/**"
+      - "backend/routes/**"
+      - "backend/engine/**"
+      - "backend/ai/**"
+      - "tests/**"
+      - ".github/workflows/ui-test.yml"
 
 jobs:
-  ui-check:
+  detect-changes:
+    name: Detect Changed Areas
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      routes: ${{ steps.filter.outputs.routes }}
+      engine: ${{ steps.filter.outputs.engine }}
+      ai: ${{ steps.filter.outputs.ai }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Filter paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+            routes:
+              - 'backend/routes/**'
+            engine:
+              - 'backend/engine/**'
+            ai:
+              - 'backend/ai/**'
+
+  frontend-check:
+    name: Frontend Role Check
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: "20"
 
-      - name: Run UI Test
-        run: node tests/ui-check.js
+      - name: Run frontend check
+        run: node tests/frontend-check.js
+
+  routes-check:
+    name: Routes Role Check
+    needs: detect-changes
+    if: needs.detect-changes.outputs.routes == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
+          pip install flask openai
+
+      - name: Run routes check
+        run: python tests/routes-check.py
+
+  engine-check:
+    name: Engine Role Check
+    needs: detect-changes
+    if: needs.detect-changes.outputs.engine == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
+          pip install flask openai
+
+      - name: Run engine check
+        run: python tests/engine-check.py
+
+  ai-check:
+    name: AI Role Check
+    needs: detect-changes
+    if: needs.detect-changes.outputs.ai == 'true'
+    runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
+          pip install flask openai
+
+      - name: Run AI check
+        run: python tests/ai-check.py
+
+  system-check:
+    name: Full System Check
+    needs:
+      - detect-changes
+      - frontend-check
+      - routes-check
+      - engine-check
+      - ai-check
+    if: always()
+    runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
+          pip install flask openai
+
+      - name: Run system check
+        run: python tests/system-check.py
