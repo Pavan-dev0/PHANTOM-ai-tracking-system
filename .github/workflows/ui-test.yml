@@ -47,10 +47,8 @@ jobs:
               - 'backend/requirements.txt'
               - 'backend/routes/**'
             engine:
-              - 'backend/requirements.txt'
               - 'backend/engine/**'
             ai:
-              - 'backend/requirements.txt'
               - 'backend/ai/**'
 
   frontend-check:
