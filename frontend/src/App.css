@@ -1570,11 +1570,23 @@ body {
   background: rgba(26, 42, 32, 0.75);
 }
 
+.settings-theme-box.is-selected .settings-theme-title,
+.settings-theme-box.is-selected .settings-theme-copy {
+  color: var(--accent-green);
+}
+
 .settings-theme-title {
   color: var(--text-primary);
   font-family: 'Space Mono', monospace;
   font-size: 12px;
   letter-spacing: 0.08em;
+}
+
+.settings-theme-note {
+  margin-top: 12px;
+  color: var(--text-muted);
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
 }
 
 .settings-theme-copy,

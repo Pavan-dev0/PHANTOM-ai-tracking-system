@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { analyseCase } from '../api';
 import { createCaseReport } from '../report';
 
@@ -130,6 +131,7 @@ function getSearchZoneUrl(searchZone) {
 }
 
 export function LocatePhone() {
+  const location = useLocation();
   const [activeCase, setActiveCase] = useState(null);
   const [focusedField, setFocusedField] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -148,6 +150,28 @@ export function LocatePhone() {
       clearTimers(timerIdsRef);
     };
   }, []);
+
+  useEffect(() => {
+    const incomingFormState = location.state?.prefillForm;
+
+    if (!incomingFormState) {
+      return;
+    }
+
+    clearTimers(timerIdsRef);
+    setActiveCase(null);
+    setIsLoading(false);
+    setFormState({
+      ...INITIAL_FORM_STATE,
+      ...incomingFormState,
+    });
+    setSubmitPhase('idle');
+    setAnalysisResult(null);
+    setSubmittedForm(null);
+    setIsResultVisible(false);
+    setIsDominantBadgeVisible(false);
+    setLitStageIndex(-1);
+  }, [location.state]);
 
   useEffect(() => {
     if (!analysisResult) {

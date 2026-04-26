@@ -39,9 +39,9 @@ def fuse_signals(movement_zone: dict, device_anchor: dict, phone_activity_notes:
 
     try:
         try:
-            from .ai_service import classify_intent
+            from .gemini_service import classify_intent
         except ImportError:
-            from ai_service import classify_intent
+            from gemini_service import classify_intent
 
         intent_result = classify_intent(phone_activity_notes)
         confidence = float(intent_result["confidence"])

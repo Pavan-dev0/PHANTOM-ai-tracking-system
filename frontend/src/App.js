@@ -1,9 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import {Dashboard} from './Pages/Dashboard.js';
-import {LocatePhone} from './Pages/LocatePhone.js';
-import {MyDevices} from './Pages/MyDevices.js';
-import {Settings} from './Pages/Settings.js';
-import {Help} from './Pages/Help.js';
+import React, { useEffect, useState } from 'react';
+import {
+  MemoryRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom';
+import { Dashboard } from './Pages/Dashboard.js';
+import { LocatePhone } from './Pages/LocatePhone.js';
+import { MyDevices } from './Pages/MyDevices.js';
+import { Settings } from './Pages/Settings.js';
+import { Help } from './Pages/Help.js';
 import Profile from './Pages/Profile.js';
 import { USE_MOCK } from './api.js';
 import './App.css';
@@ -12,37 +20,32 @@ const NAV = [
   {
     label: 'General',
     items: [
-      { id: 'dashboard', title: 'CASE OVERVIEW' },
-      { id: 'locate', title: 'NEW ANALYSIS' },
-      { id: 'devices', title: 'ACTIVE CASES' },
+      { id: 'dashboard', title: 'CASE OVERVIEW', path: '/' },
+      { id: 'locate', title: 'NEW ANALYSIS', path: '/new-analysis' },
+      { id: 'devices', title: 'ACTIVE CASES', path: '/active-cases' },
     ],
   },
   {
     label: 'Account',
     items: [
-      { id: 'profile', title: 'INVESTIGATOR PROFILE' },
-      { id: 'settings', title: 'SYSTEM SETTINGS' },
-      { id: 'help', title: 'ABOUT PHANTOM-WRAITH' },
+      { id: 'profile', title: 'INVESTIGATOR PROFILE', path: '/profile' },
+      { id: 'settings', title: 'SYSTEM SETTINGS', path: '/settings' },
+      { id: 'help', title: 'ABOUT PHANTOM-WRAITH', path: '/about' },
     ],
   },
 ];
-const PAGES = {
-  dashboard: Dashboard,
-  locate:    LocatePhone,
-  devices:   MyDevices,
-  profile:   Profile,
-  settings:  Settings,
-  help:      Help,
-};
 
+const DEFAULT_PAGE_ID = 'dashboard';
 
-function App() {
-
-  const [currentPage, setCurrentPage] = useState('dashboard');
+function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const currentPage =
+    NAV.flatMap(section => section.items).find(item => item.path === location.pathname)?.id ||
+    DEFAULT_PAGE_ID;
 
   const isLocate = currentPage === 'locate';
-  const PageComponent = PAGES[currentPage];
 
   // Close sidebar on desktop resize
   useEffect(() => {
@@ -51,11 +54,11 @@ function App() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  function navigate(id) {
-    setCurrentPage(id);
+  function handleNavigate(path) {
+    navigate(path);
     setSidebarOpen(false);
   }
-  
+
   return (
     <>
       <div className="app-grid-overlay" aria-hidden="true" />
@@ -93,7 +96,7 @@ function App() {
                 <button
                   key={item.id}
                   className={`nav-btn ${currentPage === item.id ? 'active' : ''}`}
-                  onClick={() => navigate(item.id)}
+                  onClick={() => handleNavigate(item.path)}
                 >
                   <span className="nav-icon">
                     <svg viewBox="0 0 24 24" fill="currentColor">
@@ -109,10 +112,26 @@ function App() {
 
         {/* ── MAIN CONTENT ── */}
         <main className="main">
-          <PageComponent />
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/new-analysis" element={<LocatePhone />} />
+            <Route path="/active-cases" element={<MyDevices />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/about" element={<Help />} />
+            <Route path="*" element={<Navigate replace to="/" />} />
+          </Routes>
         </main>
       </div>
     </>
+  );
+}
+
+function App() {
+  return (
+    <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+      <AppShell />
+    </MemoryRouter>
   );
 }
 
