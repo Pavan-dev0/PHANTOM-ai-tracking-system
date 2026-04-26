@@ -47,7 +47,7 @@ export function Help() {
       </div>
 
       <div className="about-footer">
-        PHANTOM-WRAITH v1.0 — Prototype Build — MCA Final Year Project
+        PHANTOM-WRAITH v1.0 — Prototype Build — MCA Hackathon Project
       </div>
     </div>
   );
