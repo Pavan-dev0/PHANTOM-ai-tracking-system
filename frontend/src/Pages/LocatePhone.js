@@ -15,44 +15,45 @@ const INITIAL_FORM_STATE = {
 
 const CASE_PRESETS = {
   case1: {
-    label: 'CASE 1 — TRANSIT INTENT',
+    label: 'CASE 1 - BENGALURU TRANSIT',
     values: {
       name: 'Ravi Kumar',
-      last_lat: '13.0827',
-      last_lng: '80.2707',
-      missing_since_hours: '6',
-      phone_lat: '13.09',
-      phone_lng: '80.28',
+      last_lat: '12.9716',
+      last_lng: '77.5946',
+      missing_since_hours: '2',
+      phone_lat: '12.9350',
+      phone_lng: '77.6245',
       phone_activity_notes:
-        'Searched Chennai Central station, looked up train timings to Bangalore, opened maps near Park Town',
+        'Searched Majestic bus stand, checked train timings, and opened maps around Bengaluru City station',
       transport_available: 'bus',
     },
   },
   case2: {
-    label: 'CASE 2 — ISOLATED OUTDOOR',
+    label: 'CASE 2 - DELHI OUTDOOR',
     values: {
       name: 'Meera Nair',
-      last_lat: '13.1',
-      last_lng: '80.25',
+      last_lat: '28.6139',
+      last_lng: '77.2090',
       missing_since_hours: '3',
-      phone_lat: '13.11',
-      phone_lng: '80.24',
+      phone_lat: '28.5355',
+      phone_lng: '77.3910',
       phone_activity_notes:
-        'Searched parks near Tambaram, looked up isolated hiking trails, maps offline mode enabled',
+        'Searched city parks near Delhi, looked up quiet trail routes, and enabled offline maps',
       transport_available: 'walking',
     },
   },
   case3: {
-    label: 'CASE 3 — UNKNOWN SUBJECT',
+    label: 'CASE 3 - MUMBAI VEHICLE',
     values: {
-      name: 'Unknown Subject',
-      last_lat: '13.05',
-      last_lng: '80.21',
-      missing_since_hours: '10',
+      name: 'Arjun Shah',
+      last_lat: '19.0760',
+      last_lng: '72.8777',
+      missing_since_hours: '1.5',
       phone_lat: '',
       phone_lng: '',
-      phone_activity_notes: 'No recent phone activity recorded',
-      transport_available: 'unknown',
+      phone_activity_notes:
+        'Recent activity showed road directions, fuel stop searches, and route previews across central Mumbai',
+      transport_available: 'car',
     },
   },
 };
@@ -116,8 +117,8 @@ function getConfidenceColor(confidence) {
 }
 
 function getSearchZoneUrl(searchZone) {
-  const fallbackLat = 13.0827;
-  const fallbackLng = 80.2707;
+  const fallbackLat = 12.9716;
+  const fallbackLng = 77.5946;
   const lat = Number.isFinite(Number(searchZone?.lat))
     ? Number(searchZone.lat)
     : fallbackLat;
@@ -125,7 +126,7 @@ function getSearchZoneUrl(searchZone) {
     ? Number(searchZone.lng)
     : fallbackLng;
 
-  return `https://www.google.com/maps/@${lat},${lng},13z`;
+  return `https://www.google.com/maps?q=${lat},${lng}&z=13`;
 }
 
 export function LocatePhone() {
@@ -423,6 +424,7 @@ export function LocatePhone() {
           >
             <option value="walking">WALKING</option>
             <option value="bus">BUS</option>
+            <option value="car">CAR</option>
             <option value="train">TRAIN</option>
             <option value="unknown">UNKNOWN</option>
           </select>

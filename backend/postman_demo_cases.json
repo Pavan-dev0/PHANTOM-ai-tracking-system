@@ -1,0 +1,65 @@
+[
+  {
+    "name": "Case 1 - Bengaluru Transit",
+    "request": {
+      "name": "Ravi Kumar",
+      "last_location": {
+        "lat": 12.9716,
+        "lng": 77.5946
+      },
+      "missing_since_hours": 2,
+      "phone_last_active": {
+        "lat": 12.935,
+        "lng": 77.6245
+      },
+      "phone_activity_notes": "Searched Majestic bus stand, checked train timings, and opened maps around Bengaluru City station",
+      "transport_available": "bus"
+    },
+    "expected_search_zone": {
+      "city": "Bengaluru",
+      "lat": 12.9716,
+      "lng": 77.5946
+    }
+  },
+  {
+    "name": "Case 2 - Delhi Outdoor",
+    "request": {
+      "name": "Meera Nair",
+      "last_location": {
+        "lat": 28.6139,
+        "lng": 77.209
+      },
+      "missing_since_hours": 3,
+      "phone_last_active": {
+        "lat": 28.5355,
+        "lng": 77.391
+      },
+      "phone_activity_notes": "Searched city parks near Delhi, looked up quiet trail routes, and enabled offline maps",
+      "transport_available": "walking"
+    },
+    "expected_search_zone": {
+      "city": "Delhi",
+      "lat": 28.6139,
+      "lng": 77.209
+    }
+  },
+  {
+    "name": "Case 3 - Mumbai Vehicle",
+    "request": {
+      "name": "Arjun Shah",
+      "last_location": {
+        "lat": 19.076,
+        "lng": 72.8777
+      },
+      "missing_since_hours": 1.5,
+      "phone_last_active": null,
+      "phone_activity_notes": "Recent activity showed road directions, fuel stop searches, and route previews across central Mumbai",
+      "transport_available": "car"
+    },
+    "expected_search_zone": {
+      "city": "Mumbai",
+      "lat": 19.076,
+      "lng": 72.8777
+    }
+  }
+]

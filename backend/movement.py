@@ -3,6 +3,7 @@ from __future__ import annotations
 TRANSPORT_SPEEDS = {
     "walking": 5.0,
     "bus": 20.0,
+    "car": 80.0,
     "train": 60.0,
     "unknown": 10.0,
 }

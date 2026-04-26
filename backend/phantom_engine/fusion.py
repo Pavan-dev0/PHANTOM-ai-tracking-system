@@ -9,6 +9,10 @@ def _current_timestamp() -> str:
     return datetime.now().strftime("%d %B %Y %H:%M")
 
 
+def _current_case_id() -> str:
+    return f"PHT-{datetime.now().year}-{random.randint(1, 999):03d}"
+
+
 def _movement_signal(movement_zone: dict) -> str:
     transport_used = movement_zone.get("transport_used", "unknown")
     return (
@@ -40,13 +44,12 @@ def fuse_signals(movement_zone: dict, device_anchor: dict, phone_activity_notes:
             from ai_service import classify_intent
 
         intent_result = classify_intent(phone_activity_notes)
-        case_id = f"PHT-2024-{random.randint(1, 999):03d}"
         confidence = float(intent_result["confidence"])
         confidence_percent = round(confidence * 100)
         dominant_engine = "WRAITH" if confidence > 0.6 else "PHANTOM"
 
         return {
-            "case_id": case_id,
+            "case_id": _current_case_id(),
             "timestamp": timestamp,
             "search_zone": search_zone,
             "destination_category": intent_result["destination_category"],
@@ -66,12 +69,12 @@ def fuse_signals(movement_zone: dict, device_anchor: dict, phone_activity_notes:
         }
     except Exception:
         return {
-            "case_id": "PHT-2024-000",
+            "case_id": "PHT-0000-000",
             "timestamp": timestamp,
             "search_zone": search_zone,
             "destination_category": "unknown",
             "confidence": 0.0,
-            "reasoning": "AI engine unavailable — manual analysis required",
+            "reasoning": "AI engine unavailable - manual analysis required",
             "gaps": "System could not process phone activity data",
             "intent_stage": "vague",
             "dominant_engine": "PHANTOM",

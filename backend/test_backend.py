@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import re
-
 import pytest
 
-from movement import get_movement_zone
-from device import get_device_anchor
 from app import app
+from device import get_device_anchor
+from movement import get_movement_zone
 
 
 VALID_ANALYSE_BODY = {
@@ -26,15 +24,48 @@ def client():
         yield test_client
 
 
+@pytest.fixture(autouse=True)
+def fake_intent_engine(monkeypatch):
+    def _fake_classify_intent(phone_activity_notes: str) -> dict:
+        notes = str(phone_activity_notes).lower()
+
+        if "park" in notes or "trail" in notes:
+            return {
+                "destination_category": "isolated_outdoor",
+                "confidence": 0.61,
+                "reasoning": "Phone activity suggests movement toward quieter outdoor areas.",
+                "gaps": "Direct destination confirmation is still missing.",
+                "intent_stage": "specific",
+            }
+
+        if "fuel" in notes or "road" in notes:
+            return {
+                "destination_category": "urban_crowded",
+                "confidence": 0.58,
+                "reasoning": "Recent searches indicate likely movement along an urban vehicle route.",
+                "gaps": "No device anchor was available to confirm the route.",
+                "intent_stage": "narrowing",
+            }
+
+        return {
+            "destination_category": "transport_hub",
+            "confidence": 0.82,
+            "reasoning": "Phone activity strongly indicates transit-oriented movement.",
+            "gaps": "Historical movement data was limited.",
+            "intent_stage": "action",
+        }
+
+    monkeypatch.setattr(
+        "phantom_engine.ai_service.classify_intent",
+        _fake_classify_intent,
+    )
+
+
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
     passed = len(terminalreporter.stats.get("passed", []))
     failed = len(terminalreporter.stats.get("failed", []))
     terminalreporter.write_line(f"SUMMARY: {passed} passed, {failed} failed")
 
-
-# ═══════════════════════════════════════════
-# SECTION 1 — movement.py tests
-# ═══════════════════════════════════════════
 
 def test_movement_bus_transport_six_hours_caps_at_fifty():
     result = get_movement_zone(13.0827, 80.2707, 6, "bus")
@@ -64,6 +95,13 @@ def test_movement_train_transport_one_hour_caps_at_fifty():
     result = get_movement_zone(13.0, 80.0, 1, "train")
 
     assert result["radius_km"] == 50.0
+
+
+def test_movement_car_transport_is_supported():
+    result = get_movement_zone(19.0760, 72.8777, 1.5, "car")
+
+    assert result["radius_km"] == 50.0
+    assert result["transport_used"] == "car"
 
 
 def test_movement_zero_hours_defaults_to_one_hour():
@@ -96,10 +134,6 @@ def test_movement_return_type_contains_all_expected_keys():
     assert "hours_missing" in result
 
 
-# ═══════════════════════════════════════════
-# SECTION 2 — device.py tests
-# ═══════════════════════════════════════════
-
 def test_device_valid_coordinates_provided_returns_available_true():
     result = get_device_anchor({"lat": 13.09, "lng": 80.28})
 
@@ -130,10 +164,6 @@ def test_device_return_type_contains_all_expected_keys():
     assert "lng" in result
     assert "available" in result
 
-
-# ═══════════════════════════════════════════
-# SECTION 3 — app.py route tests
-# ═══════════════════════════════════════════
 
 def test_health_check_route_returns_phantom_wraith_status(client):
     response = client.get("/health")
@@ -256,3 +286,57 @@ def test_analyse_route_search_zone_uses_last_location_coordinates(client):
 
     assert data["search_zone"]["lat"] == 12.9716
     assert data["search_zone"]["lng"] == 77.5946
+
+
+@pytest.mark.parametrize(
+    ("name", "body", "expected_lat", "expected_lng"),
+    [
+        (
+            "bengaluru",
+            {
+                "name": "Ravi Kumar",
+                "last_location": {"lat": 12.9716, "lng": 77.5946},
+                "missing_since_hours": 2,
+                "phone_last_active": {"lat": 12.9350, "lng": 77.6245},
+                "phone_activity_notes": "Searched Majestic bus stand and checked train timings",
+                "transport_available": "bus",
+            },
+            12.9716,
+            77.5946,
+        ),
+        (
+            "delhi",
+            {
+                "name": "Meera Nair",
+                "last_location": {"lat": 28.6139, "lng": 77.2090},
+                "missing_since_hours": 3,
+                "phone_last_active": {"lat": 28.5355, "lng": 77.3910},
+                "phone_activity_notes": "Searched city parks and quiet trail routes",
+                "transport_available": "walking",
+            },
+            28.6139,
+            77.2090,
+        ),
+        (
+            "mumbai",
+            {
+                "name": "Arjun Shah",
+                "last_location": {"lat": 19.0760, "lng": 72.8777},
+                "missing_since_hours": 1.5,
+                "phone_last_active": None,
+                "phone_activity_notes": "Recent activity showed road directions and fuel stop searches",
+                "transport_available": "car",
+            },
+            19.0760,
+            72.8777,
+        ),
+    ],
+)
+def test_demo_cases_return_real_city_coordinates(client, name, body, expected_lat, expected_lng):
+    response = client.post("/analyse", json=body)
+    data = response.get_json()
+
+    assert response.status_code == 200, name
+    assert data["search_zone"]["lat"] == pytest.approx(expected_lat), name
+    assert data["search_zone"]["lng"] == pytest.approx(expected_lng), name
+    assert isinstance(data["search_zone"]["radius_km"], float), name
