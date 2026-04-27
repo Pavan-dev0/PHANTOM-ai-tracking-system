@@ -147,6 +147,8 @@ export function Settings() {
             </button>
           </div>
 
+          <div className="settings-theme-note">Light theme coming in final version</div>
+
           <div className="settings-toggle-row">
             <div>
               <div className="settings-label">RESULT AUTO-SCROLL</div>

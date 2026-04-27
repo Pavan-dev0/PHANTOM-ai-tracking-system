@@ -56,7 +56,7 @@ def fake_intent_engine(monkeypatch):
         }
 
     monkeypatch.setattr(
-        "phantom_engine.ai_service.classify_intent",
+        "phantom_engine.gemini_service.classify_intent",
         _fake_classify_intent,
     )
 

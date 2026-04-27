@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const COUNT_UP_DURATION_MS = 1000;
 const COUNT_UP_INTERVAL_MS = 20;
@@ -58,6 +59,7 @@ function getConfidenceColor(confidence) {
 }
 
 export function Dashboard() {
+  const navigate = useNavigate();
   const [currentTime, setCurrentTime] = useState(() => new Date());
   const [animatedStats, setAnimatedStats] = useState({
     casesToday: 0,
@@ -359,6 +361,7 @@ export function Dashboard() {
 
                       <button
                         type="button"
+                        onClick={() => navigate('/new-analysis')}
                         style={{
                           background: '#111318',
                           border: '1px solid #00e5a0',
