@@ -127,5 +127,3 @@ Notes:
   python -m pip install -r backend\requirements.txt
   ```
 
-- `OPTIONS /analyse 404`
-  The frontend is calling the wrong endpoint. The Flask backend uses `/api/analyze`.
