@@ -1,6 +1,6 @@
 # PHANTOM AI Tracking System
 
-PHANTOM is a prototype missing-person tracking system with a React frontend and a Flask backend. 
+PHANTOM is a prototype missing-person tracking system with a React frontend and a Flask backend.
 
 ## Tech Stack
 - React
